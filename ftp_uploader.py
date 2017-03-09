@@ -58,13 +58,12 @@ class ftp_uploader:
         self.current_file_dict = dict()
         for item in gen_list:
             current_file_name = item[0]
-            print("current_file_name " + current_file_name)
             try:
                 current_file_size = item[1]['size']
             except KeyError:
                 current_file_size = int(-1)
             self.current_file_dict[current_file_name] = current_file_size
-        print(self.current_file_dict)
+
 
     def get_file_size(self, filename):
         # print("filename " + filename)

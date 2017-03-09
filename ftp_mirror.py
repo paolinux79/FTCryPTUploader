@@ -26,7 +26,9 @@ class ftp_mirror:
             ftp = ftp_uploader(ftp_config=self.ftp_config)
             ftp.connect()
             ftp.set_remote_initial_dir(self.ftp_config.initial_dir)
-            ftp.change_or_create_to_dir(self.start_remote_path)
+            init_dirs = self.start_remote_path.split(os.sep)
+            for init_dir in init_dirs:
+                ftp.change_or_create_to_dir(init_dir)
             if trailing_dirs is not None:
                 for current_dir in trailing_dirs:
                     print("current dir " + current_dir)
@@ -44,5 +46,5 @@ with open("props.json") as data_file:
     settings = json.load(data_file)
 
 config = ftp_config(host=settings["host"], username=settings["user"], password=settings["passwd"], key=settings["aes_key"], initial_dir=settings["initial_dir"])
-x = ftp_mirror("/home/paolinux/SoapUI-5.2.1","upload",None,config)
+x = ftp_mirror("/home/paolinux/SoapUI-5.2.1","upload/SoapUI-5.2.1",None,config)
 x.crawl()

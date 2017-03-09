@@ -27,8 +27,25 @@ def unpad(block):
 
 
 def decypt_to_file(infile, outfile):
+    print(infile + " => " + outfile)
     with open(outfile,'wb') as out_file:
-        output = decypt(infile)
+        output = b""
+        if os.path.getsize(outfile) != 0:
+            output = decypt(infile)
         out_file.write(output)
 
-decypt_to_file("/home/paolinux/a19.xxx","/home/paolinux/a19.dec")
+
+# decypt_to_file("/home/paolinux/test/1.xxx","/home/paolinux/test/1.dec")
+# exit(-1)
+
+enc_dir = "/home/paolinux/test"
+dec_dir = "/home/paolinux/DEC"
+
+for root, dirs, files in os.walk(enc_dir):
+    for f in files:
+        inpath = os.path.join(root,f)
+        outpath = inpath.replace(enc_dir,dec_dir)
+        current_out_dir = os.path.split(outpath)[0]
+        if not os.path.exists(current_out_dir):
+            os.mkdir(current_out_dir)
+        decypt_to_file(inpath,outpath)
