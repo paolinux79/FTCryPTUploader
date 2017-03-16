@@ -7,8 +7,7 @@ FTCryPTUploader is a small python3 script written to upload files to an FTP serv
  - avoiding any unnecessary disk accesses
  - keeping a very low memory footprint
 
-It uses AES Cipher in EBC mode to encrypt and PKCS#7 to pad.
-The only "extra" requirements is pyCrypto.
+It uses AES Cipher in EBC mode to encrypt and PKCS#7 to pad hence the only "extra" requirements is pyCrypto.
 
 
 
