@@ -29,8 +29,6 @@ class ftp_uploader:
         self.password = ftp_config.password
         self.username = ftp_config.username
         if ftp_config.key is not None:
-            # iv = Random.new().read(CAST.block_size)
-            # print("preparing cipherer")
             self.cipherer = AES.new(ftp_config.key, AES.MODE_ECB)
 
     def connect(self):
@@ -44,11 +42,14 @@ class ftp_uploader:
         self.get_file_list_size()
 
     def mkdir(self,dirname):
-        self.initialized_ftp.mkd(dirname=dirname)
+        try:
+            self.initialized_ftp.mkd(dirname=dirname)
+        except ftplib.error_perm as e:
+            print(e.__cause__)
 
     def change_or_create_to_dir(self,dirname):
         dir_present = self.is_dir_present(dirname)
-        print("dir_present " + str(dir_present))
+        # print("dir_present " + str(dir_present))
         if not dir_present:
             self.mkdir(dirname=dirname)
         self.set_remote_initial_dir(dirname=dirname)
@@ -105,6 +106,7 @@ class ftp_uploader:
             cf.close()
         else:
             print("file already completed")
+            pass
 
     def shutdown(self):
         self.initialized_ftp.quit()

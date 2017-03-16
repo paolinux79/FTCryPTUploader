@@ -10,10 +10,11 @@ class crypt_file:
     def __init__(self, cipherer, cipherer_block_size):
         self.cipherer = cipherer
         self.cipherer_block_size = cipherer_block_size
-        if self.cipherer is None:
-            print("no cipherer")
-        else:
-            print("cipherer provided")
+        # if self.cipherer is None:
+        #     print("no cipherer")
+        # else:
+        #     print("cipherer provided")
+
 
     def open(self, filename):
         self.opened_file = open(filename, 'rb')
@@ -23,16 +24,16 @@ class crypt_file:
     def read(self, size):
         time.sleep(1)
         if self.cipherer is not None:
-            print("ciphering")
+            # print("ciphering")
             current_position = self.opened_file.tell()
-            print("current_position " + str(current_position))
-            print("requesting " + str(size))
+            # print("current_position " + str(current_position))
+            # print("requesting " + str(size))
             padme = False
             if current_position + size >= self.file_size:
-                print("PAD ME ENABLED")
+                # print("PADDING REQUESTED")
                 padme = True
             plaintext = self.opened_file.read(size)
-            print("got " + str(len(plaintext)))
+            # print("got " + str(len(plaintext)))
             if not plaintext:
                 return plaintext
             return self.cipher(plaintext=plaintext, padme=padme)
@@ -53,15 +54,15 @@ class crypt_file:
 
     # PKCS7
     def pad(self, block):
-        print("incoming block size " + str(len(block)))
+        # print("incoming block size " + str(len(block)))
         block_size = len(block)
         amount_to_pad = self.cipherer_block_size - (block_size % self.cipherer_block_size)
-        print("amount to pad " + str(amount_to_pad))
+        # print("amount to pad " + str(amount_to_pad))
         if amount_to_pad == 0:
             amount_to_pad = self.cipherer_block_size
         pad = bytes([amount_to_pad])
         pad_block = pad * amount_to_pad
         padded_block = block + pad_block
-        print("padded block size " + str(len(padded_block)))
+        # print("padded block size " + str(len(padded_block)))
         return padded_block
 

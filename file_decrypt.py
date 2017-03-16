@@ -30,7 +30,7 @@ def decypt_to_file(infile, outfile):
     print(infile + " => " + outfile)
     with open(outfile,'wb') as out_file:
         output = b""
-        if os.path.getsize(outfile) != 0:
+        if os.path.getsize(infile) != 0:
             output = decypt(infile)
         out_file.write(output)
 
@@ -47,5 +47,5 @@ for root, dirs, files in os.walk(enc_dir):
         outpath = inpath.replace(enc_dir,dec_dir)
         current_out_dir = os.path.split(outpath)[0]
         if not os.path.exists(current_out_dir):
-            os.mkdir(current_out_dir)
+            os.makedirs(current_out_dir,exist_ok=True)
         decypt_to_file(inpath,outpath)
