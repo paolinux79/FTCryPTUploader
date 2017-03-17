@@ -1,7 +1,9 @@
 import os.path
 import time
-class crypt_file:
 
+
+class CryptFile:
+    """ a wrapper for the python file class providing encrypting features"""
     opened_file = None
     cipherer = None
     cipherer_block_size = None

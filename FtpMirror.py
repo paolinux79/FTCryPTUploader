@@ -1,12 +1,12 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-from ftp_uploader import ftp_uploader
-from ftp_uploader import ftp_config
+from FtpUploader import FtpUploader
+from FtpUploader import FtpConfig
 import time
 
-class ftp_mirror:
-
+class FtpMirror:
+    """a class written to perform a full mirror copy from local to ftp server"""
     start_local_path = None
     start_remote_path = None
     depth = None
@@ -28,7 +28,7 @@ class ftp_mirror:
         trailing_dirs = None
         if len(current_root) > 1:
             trailing_dirs = current_root.split(os.sep)
-        ftp = ftp_uploader(ftp_config=self.ftp_config)
+        ftp = FtpUploader(ftp_config=self.ftp_config)
         ftp.connect()
         ftp.set_remote_initial_dir(self.ftp_config.initial_dir)
         init_dirs = self.start_remote_path.split(os.sep)
@@ -72,14 +72,19 @@ class ftp_mirror:
             time.sleep(3)
 
 
+def test():
+    import json
 
-import json
+    with open("props.json", "rb") as data_file:
+        settings = json.load(data_file)
 
-with open("props.json") as data_file:
-    settings = json.load(data_file)
+    config = FtpConfig(host=settings["host"], username=settings["user"], password=settings["passwd"],
+                       key=settings["aes_key"], initial_dir=settings["initial_dir"])
+    ftpMirror = FtpMirror("/home/paolinux/EAP-6.4.0", "upload/EAP-6.4.0", None, config, 10)
+    start = time.time()
+    ftpMirror.crawl()
+    print(str(time.time() - start))
 
-config = ftp_config(host=settings["host"], username=settings["user"], password=settings["passwd"], key=settings["aes_key"], initial_dir=settings["initial_dir"])
-x = ftp_mirror("/home/paolinux/EAP-6.4.0","upload/EAP-6.4.0",None,config,10)
-start = time.time()
-x.crawl()
-print(str(time.time() - start))
+if __name__ == '__main__':
+    test()
+

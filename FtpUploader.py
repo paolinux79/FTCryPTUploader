@@ -1,12 +1,12 @@
 import ftplib
 from Crypto.Cipher import AES
 import os.path
-import crypt_file
+import CryptFile
 
 FILE_BLOCK_SIZE = 1048576
 
-class ftp_config:
-
+class FtpConfig:
+    """a simple class to keep ftp configuration"""
     def __init__(self, host, username, password, key, initial_dir):
         self.host = host
         self.password = password
@@ -14,7 +14,7 @@ class ftp_config:
         self.key = key
         self.initial_dir = initial_dir
 
-class ftp_uploader:
+class FtpUploader:
     """a simple ftp uploader"""
     host = None
     username = None
@@ -87,7 +87,7 @@ class ftp_uploader:
         # print("remote file size " + str(remote_file_size))
         if remote_file_size is None:
             # print("this is a new file")
-            cf = crypt_file.crypt_file(cipherer=self.cipherer, cipherer_block_size=AES.block_size)
+            cf = CryptFile.CryptFile(cipherer=self.cipherer, cipherer_block_size=AES.block_size)
             cf.open(local_file_name)
             self.initialized_ftp.storbinary(cmd="STOR " + remote_file_name, fp=cf, blocksize=FILE_BLOCK_SIZE)
             cf.close()
@@ -98,7 +98,7 @@ class ftp_uploader:
             transferred_size = transferred_blocks * FILE_BLOCK_SIZE
             # print("transferred_blocks " + str(transferred_blocks))
             # print("transferred_size " + str(transferred_size))
-            cf = crypt_file.crypt_file(cipherer=self.cipherer, cipherer_block_size=AES.block_size)
+            cf = CryptFile.CryptFile(cipherer=self.cipherer, cipherer_block_size=AES.block_size)
             cf.open(local_file_name)
             cf.seek(transferred_size)
             # print("shifted")

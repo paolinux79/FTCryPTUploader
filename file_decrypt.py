@@ -35,17 +35,19 @@ def decypt_to_file(infile, outfile):
         out_file.write(output)
 
 
-# decypt_to_file("/home/paolinux/test/1.xxx","/home/paolinux/test/1.dec")
-# exit(-1)
+def test():
+    enc_dir = "/home/paolinux/test"
+    dec_dir = "/home/paolinux/DEC"
 
-enc_dir = "/home/paolinux/test"
-dec_dir = "/home/paolinux/DEC"
+    for root, dirs, files in os.walk(enc_dir):
+        for f in files:
+            inpath = os.path.join(root, f)
+            outpath = inpath.replace(enc_dir, dec_dir)
+            current_out_dir = os.path.split(outpath)[0]
+            if not os.path.exists(current_out_dir):
+                os.makedirs(current_out_dir, exist_ok=True)
+            decypt_to_file(inpath, outpath)
 
-for root, dirs, files in os.walk(enc_dir):
-    for f in files:
-        inpath = os.path.join(root,f)
-        outpath = inpath.replace(enc_dir,dec_dir)
-        current_out_dir = os.path.split(outpath)[0]
-        if not os.path.exists(current_out_dir):
-            os.makedirs(current_out_dir,exist_ok=True)
-        decypt_to_file(inpath,outpath)
+if __name__ == '__main__':
+    test()
+
