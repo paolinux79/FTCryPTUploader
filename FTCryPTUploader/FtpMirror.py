@@ -1,9 +1,10 @@
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 
-from FtpUploader import FtpUploader
-from FtpUploader import FtpConfig
-import time
+from FTCryPTUploader.FtpUploader import FtpConfig
+from FTCryPTUploader.FtpUploader import FtpUploader
+
 
 class FtpMirror:
     """a class written to perform a full mirror copy from local to ftp server"""

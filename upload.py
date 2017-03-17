@@ -1,5 +1,7 @@
-import FtpUploader
 import json
+
+from FTCryPTUploader import FtpUploader
+
 
 def main():
     with open("props.json") as data_file:

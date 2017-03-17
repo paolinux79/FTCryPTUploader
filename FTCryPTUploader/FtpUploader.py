@@ -1,7 +1,9 @@
 import ftplib
-from Crypto.Cipher import AES
 import os.path
-import CryptFile
+
+from Crypto.Cipher import AES
+
+from FTCryPTUploader import CryptFile
 
 FILE_BLOCK_SIZE = 1048576
 
