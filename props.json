@@ -1,0 +1,7 @@
+{
+  "host" : "ftp.mysite.com",
+  "user" : "username",
+  "passwd" : "ftp_pass",
+  "initial_dir" : "this_dir",
+  "aes_key" : "password"
+}

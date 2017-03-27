@@ -1,9 +1,10 @@
 import json
-
+import time
 from FTCryPTUploader import FtpUploader
+from FTCryPTUploader import FtpMirror
 
 
-def main():
+def single():
     with open("props.json") as data_file:
         settings = json.load(data_file)
 
@@ -18,7 +19,20 @@ def main():
     ftp.shutdown()
 
 
+def mirror():
+    import json
+
+    with open("props.json", "r") as data_file:
+        settings = json.load(data_file)
+
+    config = FtpUploader.FtpConfig(host=settings["host"], username=settings["user"], password=settings["passwd"],
+                                   key=settings["aes_key"], initial_dir=settings["initial_dir"])
+    ftpMirror = FtpMirror.FtpMirror(start_local_path="/home/paolinux/Dropbox", start_remote_path="upload/Dropbox",
+                                    depth=None, ftp_config=config, max_workers=10)
+    start = time.time()
+    ftpMirror.crawl()
+    print(str(time.time() - start))
+
+
 if __name__ == '__main__':
-    main()
-
-
+    mirror()
