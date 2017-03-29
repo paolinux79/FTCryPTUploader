@@ -24,7 +24,7 @@ def single():
     ftp.shutdown()
 
 
-def mirror():
+def mirror(start_local_path,start_remote_path):
     signal.signal(signal.SIGINT, signal_handler)
 
     global ftpCoord
@@ -36,11 +36,11 @@ def mirror():
     config = FtpUploader.FtpConfig(host=settings["host"], username=settings["user"], password=settings["passwd"],
                                    key=settings["aes_key"], initial_dir=settings["initial_dir"])
 
-    ftpMirror = FtpMirror.FtpMirror(start_local_path="/home/paolinux/Dropbox", start_remote_path="upload/Dropbox",
+    ftpMirror = FtpMirror.FtpMirror(start_local_path=start_local_path, start_remote_path=start_remote_path,
                                     depth=None, ftp_config=config, max_workers=10, ftpCoord=ftpCoord)
     start = time.time()
     ftpMirror.crawl()
-    print(str(time.time() - start))
+    print("Total elapsed crawling time is: " + str(time.time() - start))
 
 
 def signal_handler(signal, frame):
@@ -50,4 +50,10 @@ def signal_handler(signal, frame):
 
 
 if __name__ == '__main__':
-    mirror()
+    if len(sys.argv) != 3:
+        print("2 parameters are needed: start_local_path and start_remote_path")
+        print("e.g.,")
+        print("/home/myhome/Backup upload/Backup")
+        exit()
+    # mirror(start_local_path="/home/paolinux/Dropbox", start_remote_path="upload/Dropbox")
+    mirror(start_local_path=sys.argv[1], start_remote_path=sys.argv[2])

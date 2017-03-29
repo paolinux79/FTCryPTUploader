@@ -42,4 +42,4 @@ class FtpCoord:
         print("elapsed: " + str(elapsed))
         print("size: " + str(size))
         if size > 0 and elapsed > 0:
-            print("bandwith: " + str((size/elapsed)/1024) + " Kib/s")
+            print("bandwith: " + str((size/elapsed)/1024) + " KiB/s")
