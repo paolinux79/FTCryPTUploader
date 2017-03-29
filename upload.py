@@ -20,7 +20,7 @@ def single():
     ftp.set_remote_initial_dir(config.initial_dir)
     ftp.set_remote_initial_dir("upload")
 
-    status = ftp.xfer(remote_file_name="1.xxx", local_file_name="/home/paolinux/SoapUI-5.2.1/LICENSE.txt")
+    ftp.xfer(remote_file_name="1.xxx", local_file_name="/home/paolinux/SoapUI-5.2.1/LICENSE.txt")
     ftp.shutdown()
 
 
