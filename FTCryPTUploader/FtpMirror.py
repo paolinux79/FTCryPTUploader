@@ -6,6 +6,7 @@ from FTCryPTUploader.FtpUploader import FtpConfig
 from FTCryPTUploader.FtpUploader import FtpUploader
 
 
+
 class FtpMirror:
     """a class written to perform a full mirror copy from local to ftp server"""
     start_local_path = None
@@ -14,16 +15,22 @@ class FtpMirror:
     ftp_config = None
     executor = None
     futures_pit = None
+    ftpCoord = None
 
-    def __init__(self, start_local_path, start_remote_path, depth, ftp_config, max_workers):
+    def __init__(self, start_local_path, start_remote_path, depth, ftp_config, max_workers, ftpCoord):
         self.start_local_path = start_local_path
         self.start_remote_path = start_remote_path
         self.depth = depth
         self.ftp_config = ftp_config
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
+        self.ftpCoord = ftpCoord
 
     def process_current_directory(self, root, files):
         start = time.time()
+        if self.ftpCoord.need_to_stop():
+            print("need to stop")
+            stop = time.time()
+            return stop - start
         index = len(self.start_local_path)
         current_root = root[index + 1:]
         trailing_dirs = None
@@ -42,7 +49,22 @@ class FtpMirror:
         for infile in files:
             filepath = os.path.join(root, infile)
             print("filename is " + infile + " with filepath " + filepath)
-            ftp.xfer(infile, local_file_name=filepath)
+            if self.ftpCoord.need_to_stop():
+                print("need to stop")
+                stop = time.time()
+                return stop - start
+            try:
+                filestart = time.time()
+                status = ftp.xfer(infile, local_file_name=filepath)
+            except:
+                status = 'failed'
+            finally:
+                filestop = time.time()
+                file_elapsed = filestop - filestart
+            xferred_size = 0
+            if status == 'resumed' or status == 'xferred':
+                xferred_size = os.path.getsize(filepath)
+            self.ftpCoord.update_stats(filepath=filepath, status=status, size=xferred_size, elapsed=file_elapsed)
         ftp.shutdown()
         stop = time.time()
         return stop - start
@@ -59,6 +81,7 @@ class FtpMirror:
         running = len(self.futures_pit)
         while True:
             print("====> there are " + str(running) + " enqueued threads")
+            self.ftpCoord.show_stats()
             if running == 0:
                 break
 

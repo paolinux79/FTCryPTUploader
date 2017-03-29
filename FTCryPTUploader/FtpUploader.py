@@ -39,7 +39,7 @@ class FtpUploader:
         self.initialized_ftp = ftp
 
     def set_remote_initial_dir(self, dirname):
-        print("going into ftp " + dirname)
+        # print("going into ftp " + dirname)
         self.initialized_ftp.cwd(dirname=dirname)
         self.get_file_list_size()
 
@@ -93,6 +93,7 @@ class FtpUploader:
             cf.open(local_file_name)
             self.initialized_ftp.storbinary(cmd="STOR " + remote_file_name, fp=cf, blocksize=FILE_BLOCK_SIZE)
             cf.close()
+            return 'xferred'
         elif int(remote_file_size) < local_file_size:
             # print("this is a file to be resumed")
             remote_file_size = int(remote_file_size)
@@ -106,11 +107,15 @@ class FtpUploader:
             # print("shifted")
             self.initialized_ftp.storbinary(cmd="STOR " + remote_file_name, fp=cf, rest=transferred_size, blocksize=FILE_BLOCK_SIZE)
             cf.close()
+            return 'resumed'
         else:
-            print("file already completed")
-            pass
+            # print("file already completed")
+            return 'already'
 
     def shutdown(self):
-        self.initialized_ftp.quit()
+        try:
+            self.initialized_ftp.quit()
+        except:
+            pass
 
 
