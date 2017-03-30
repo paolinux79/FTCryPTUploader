@@ -24,7 +24,7 @@ def single():
     ftp.shutdown()
 
 
-def mirror(start_local_path,start_remote_path):
+def mirror(start_local_path, start_remote_path):
     signal.signal(signal.SIGINT, signal_handler)
 
     global ftpCoord
@@ -56,4 +56,9 @@ if __name__ == '__main__':
         print("/home/myhome/Backup upload/Backup")
         exit()
     # mirror(start_local_path="/home/paolinux/Dropbox", start_remote_path="upload/Dropbox")
-    mirror(start_local_path=sys.argv[1], start_remote_path=sys.argv[2])
+    start_local_path = sys.argv[1]
+    start_remote_path = sys.argv[2]
+    if start_local_path.endswith("/") or start_remote_path.endswith("/"):
+        print("directories should not end with /")
+        exit()
+    mirror(start_local_path=start_local_path, start_remote_path=start_remote_path)
