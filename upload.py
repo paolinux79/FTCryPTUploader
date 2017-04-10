@@ -37,7 +37,7 @@ def mirror(start_local_path, start_remote_path):
                                    key=settings["aes_key"], initial_dir=settings["initial_dir"])
 
     ftpMirror = FtpMirror.FtpMirror(start_local_path=start_local_path, start_remote_path=start_remote_path,
-                                    depth=None, ftp_config=config, max_workers=10, ftpCoord=ftpCoord)
+                                    depth=None, ftp_config=config, max_workers=1, ftpCoord=ftpCoord)
     start = time.time()
     ftpMirror.crawl()
     print("Total elapsed crawling time is: " + str(time.time() - start))
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         print("e.g.,")
         print("/home/myhome/Backup upload/Backup")
         exit()
-    # mirror(start_local_path="/home/paolinux/Dropbox", start_remote_path="upload/Dropbox")
+    # mirror(start_local_path="/home/paolinux/raid", start_remote_path="upload/raid")
     start_local_path = sys.argv[1]
     start_remote_path = sys.argv[2]
     if start_local_path.endswith("/") or start_remote_path.endswith("/"):

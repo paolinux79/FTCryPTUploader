@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from FTCryPTUploader.FtpUploader import FtpConfig
 from FTCryPTUploader.FtpUploader import FtpUploader
+import threading
 
 
 
@@ -16,6 +17,7 @@ class FtpMirror:
     executor = None
     futures_pit = None
     ftpCoord = None
+    lock = None
 
     def __init__(self, start_local_path, start_remote_path, depth, ftp_config, max_workers, ftpCoord):
         self.start_local_path = start_local_path
@@ -24,6 +26,7 @@ class FtpMirror:
         self.ftp_config = ftp_config
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.ftpCoord = ftpCoord
+        self.lock = threading.Lock()
 
     def process_current_directory(self, root, files):
         start = time.time()
@@ -48,15 +51,17 @@ class FtpMirror:
                 ftp.change_or_create_to_dir(current_dir)
         for infile in files:
             filepath = os.path.join(root, infile)
-            print("filename is " + infile + " with filepath " + filepath)
+            print("Filepath is " + filepath + " and size is " + str(os.path.getsize(filepath)))
             if self.ftpCoord.need_to_stop():
                 print("need to stop")
                 stop = time.time()
                 return stop - start
             try:
                 filestart = time.time()
-                status = ftp.xfer(infile, local_file_name=filepath)
+                status = ftp.xfer(remote_file_name=infile, local_file_name=filepath)
             except:
+                import traceback
+                traceback.print_exc()
                 status = 'failed'
             finally:
                 filestop = time.time()
@@ -65,6 +70,7 @@ class FtpMirror:
             if status == 'resumed' or status == 'xferred':
                 xferred_size = os.path.getsize(filepath)
             self.ftpCoord.update_stats(filepath=filepath, status=status, size=xferred_size, elapsed=file_elapsed)
+
         ftp.shutdown()
         stop = time.time()
         return stop - start
@@ -74,7 +80,8 @@ class FtpMirror:
         for root, dirs, files in os.walk(self.start_local_path):
             # self.process_current_directory(root=root, files=files)
             future = self.executor.submit(self.process_current_directory, root, files)
-            self.futures_pit[future] = None
+            with self.lock:
+                self.futures_pit[future] = None
         self.status_updater()
 
     def status_updater(self):
@@ -83,17 +90,19 @@ class FtpMirror:
             print("====> there are " + str(running) + " enqueued threads")
             self.ftpCoord.show_stats()
             if running == 0:
+                print("====> there are NO enqueued threads")
                 break
+            with self.lock:
+                for k, v in self.futures_pit.items():
+                    # print("anayzing " + str(k))
+                    if k.done():
+                        elapsed = self.futures_pit[k]
+                        if elapsed is None:
+                            self.futures_pit[k] = k.result()
+                            print("====> thread finished in  " + str(self.futures_pit[k]) + " ms")
+                            running -= 1
+            time.sleep(1)
 
-            for k, v in self.futures_pit.items():
-                # print("anayzing " + str(k))
-                if k.done():
-                    elapsed = self.futures_pit[k]
-                    if elapsed is None:
-                        self.futures_pit[k] = k.result()
-                        print("====> thread finished in  " + str(self.futures_pit[k]) + " ms")
-                        running -= 1
-            time.sleep(3)
 
 
 def test():

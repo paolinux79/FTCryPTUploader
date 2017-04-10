@@ -1,10 +1,13 @@
+import threading
 class FtpCoord:
 
     shutdown = None
+    lock = None
     stats = {}
 
     def __init__(self):
         self.shutdown = False
+        self.lock = threading.Lock()
 
     def kill(self):
         print("raising shutdown")
@@ -14,7 +17,8 @@ class FtpCoord:
         return self.shutdown
 
     def update_stats(self, filepath, size, status, elapsed):
-        self.stats[filepath] = {'size':size, 'status' : status, 'elapsed' :elapsed}
+        with self.lock:
+            self.stats[filepath] = {'size':size, 'status' : status, 'elapsed' :elapsed}
 
     def show_stats(self):
         xferred = 0
@@ -23,18 +27,19 @@ class FtpCoord:
         already = 0
         elapsed = 0
         size = 0
-        for k, v in self.stats.items():
-            if v['status'] == 'xferred':
-                xferred += 1
-            elif v['status'] == 'resumed':
-                resumed += 1
-            elif v['status'] == 'failed':
-                print(k)
-                failed += 1
-            elif v['status'] == 'already':
-                already += 1
-            elapsed += v['elapsed']
-            size += v['size']
+        with self.lock:
+            for k, v in self.stats.items():
+                if v['status'] == 'xferred':
+                    xferred += 1
+                elif v['status'] == 'resumed':
+                    resumed += 1
+                elif v['status'] == 'failed':
+                    print(k)
+                    failed += 1
+                elif v['status'] == 'already':
+                    already += 1
+                elapsed += v['elapsed']
+                size += v['size']
         print("xferred: " + str(xferred))
         print("resumed: " + str(resumed))
         print("failed: " + str(failed))
