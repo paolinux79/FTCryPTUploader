@@ -24,7 +24,7 @@ def single():
     ftp.shutdown()
 
 
-def mirror(start_local_path, start_remote_path):
+def mirror(start_local_path, start_remote_path, max_workers):
     signal.signal(signal.SIGINT, signal_handler)
 
     global ftpCoord
@@ -37,7 +37,7 @@ def mirror(start_local_path, start_remote_path):
                                    key=settings["aes_key"], initial_dir=settings["initial_dir"])
 
     ftpMirror = FtpMirror.FtpMirror(start_local_path=start_local_path, start_remote_path=start_remote_path,
-                                    depth=None, ftp_config=config, max_workers=1, ftpCoord=ftpCoord)
+                                    depth=None, ftp_config=config, max_workers=max_workers, ftpCoord=ftpCoord)
     start = time.time()
     ftpMirror.crawl()
     print("Total elapsed crawling time is: " + str(time.time() - start))
@@ -50,15 +50,16 @@ def signal_handler(signal, frame):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("2 parameters are needed: start_local_path and start_remote_path")
+    if len(sys.argv) != 4:
+        print("3 parameters are needed: start_local_path and start_remote_path and threads")
         print("e.g.,")
-        print("/home/myhome/Backup upload/Backup")
+        print("/home/myhome/Backup upload/Backup 5")
         exit()
     # mirror(start_local_path="/home/paolinux/raid", start_remote_path="upload/raid")
     start_local_path = sys.argv[1]
     start_remote_path = sys.argv[2]
+    max_workers = int(sys.argv[3])
     if start_local_path.endswith("/") or start_remote_path.endswith("/"):
         print("directories should not end with /")
         exit()
-    mirror(start_local_path=start_local_path, start_remote_path=start_remote_path)
+    mirror(start_local_path=start_local_path, start_remote_path=start_remote_path, max_workers=max_workers)

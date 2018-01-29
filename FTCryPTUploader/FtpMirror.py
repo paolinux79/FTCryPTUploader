@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from FTCryPTUploader.FtpUploader import FtpConfig
 from FTCryPTUploader.FtpUploader import FtpUploader
+from FTCryPTUploader.FtpCoord import FtpCoord
 import threading
 
 
@@ -108,12 +109,13 @@ class FtpMirror:
 def test():
     import json
 
-    with open("props.json", "rb") as data_file:
-        settings = json.load(data_file)
+    with open("myprops.json", "r") as data_file:
+        settings = json.loads(data_file.read())
 
     config = FtpConfig(host=settings["host"], username=settings["user"], password=settings["passwd"],
                        key=settings["aes_key"], initial_dir=settings["initial_dir"])
-    ftpMirror = FtpMirror("/home/paolinux/EAP-6.4.0", "upload/EAP-6.4.0", None, config, 10)
+    ftpCoord = FtpCoord()
+    ftpMirror = FtpMirror("/home/paolinux/EAP-6.4.8", "upload/EAP-6.4.8", None, config, 10, ftpCoord)
     start = time.time()
     ftpMirror.crawl()
     print(str(time.time() - start))
