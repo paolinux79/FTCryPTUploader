@@ -33,11 +33,23 @@ class FtpUploader:
         if ftp_config.key is not None:
             self.cipherer = AES.new(ftp_config.key, AES.MODE_ECB)
 
-    def connect(self):
-        ftp = ftplib.FTP_TLS(self.host)
+    def plain_connect(self):
+        ftp = ftplib.FTP(self.host)
+        ftp.login(user=self.username, passwd=self.password)
+        # ftp.prot_p()
+        self.initialized_ftp = ftp
+
+    def secure_connect(self):
+        ftp = ftplib.FTP(self.host)
         ftp.login(user=self.username, passwd=self.password)
         ftp.prot_p()
         self.initialized_ftp = ftp
+
+    def connect(self):
+        try:
+            self.secure_connect()
+        except:
+            self.plain_connect()
 
     def set_remote_initial_dir(self, dirname):
         # print("going into ftp " + dirname)
