@@ -40,7 +40,7 @@ class FtpUploader:
         self.initialized_ftp = ftp
 
     def secure_connect(self):
-        ftp = ftplib.FTP(self.host)
+        ftp = ftplib.FTP_TLS(self.host)
         ftp.login(user=self.username, passwd=self.password)
         ftp.prot_p()
         self.initialized_ftp = ftp
@@ -49,6 +49,7 @@ class FtpUploader:
         try:
             self.secure_connect()
         except:
+            print("fallback to plain connect")
             self.plain_connect()
 
     def set_remote_initial_dir(self, dirname):
